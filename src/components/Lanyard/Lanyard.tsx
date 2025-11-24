@@ -334,7 +334,11 @@ function Band({
       </group>
 
       <mesh ref={band}>
+        {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+        {/* @ts-ignore */}
         <meshLineGeometry />
+        {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+        {/* @ts-ignore */}
         <meshLineMaterial
           color="white"
           depthTest={false}

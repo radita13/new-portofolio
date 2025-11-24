@@ -1,8 +1,6 @@
 import type { Metadata } from "next"
 import localFont from "next/font/local"
 import "./globals.css"
-// import Navbar from "@/components/shared/Navbar"
-// import Template from "./template"
 import ClientLayout from "@/components/Clientlayout"
 
 const clashDisplay = localFont({

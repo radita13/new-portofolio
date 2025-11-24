@@ -1,9 +1,24 @@
 "use client"
 
-import { useRef, useLayoutEffect, useEffect } from "react"
+import { useRef, useLayoutEffect, useEffect, Suspense } from "react"
 import { usePathname, useSearchParams } from "next/navigation"
 import gsap from "gsap"
 import { projectData } from "@/data/project"
+
+function TransitionTrigger({ onRouteChanged }: { onRouteChanged: () => void }) {
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const isFirstMount = useRef(true)
+
+  useEffect(() => {
+    if (isFirstMount.current) {
+      isFirstMount.current = false
+      return
+    }
+    onRouteChanged()
+  }, [pathname, searchParams, onRouteChanged])
+  return null
+}
 
 export default function Template({ children }: { children: React.ReactNode }) {
   const mainContentRef = useRef<HTMLDivElement>(null)
@@ -18,7 +33,6 @@ export default function Template({ children }: { children: React.ReactNode }) {
   const project = projectData.find((p) => p.slug === lastSegment)
   const displayText = project ? project.title : lastSegment
 
-  const searchParams = useSearchParams()
   const isInitialLoad = useRef(true)
 
   const animatePageTransition = (onComplete?: () => void) => {
@@ -118,16 +132,12 @@ export default function Template({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  // Handle route changes
-  useEffect(() => {
-    if (!isInitialLoad.current) {
-      gsap.set(mainContentRef.current, { opacity: 0 })
-      animatePageTransition()
-    }
-  }, [pathname, searchParams])
-
   return (
     <>
+      <Suspense fallback={null}>
+        <TransitionTrigger onRouteChanged={animatePageTransition} />
+      </Suspense>
+
       <div ref={mainContentRef} style={{ opacity: 0 }}>
         {children}
       </div>

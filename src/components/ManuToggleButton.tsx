@@ -6,12 +6,13 @@ import { Button } from "./ui/Button"
 interface MenuToggleButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isOpen: boolean
+  isLight: boolean
 }
 
 const MenuToggleButton = React.forwardRef<
   HTMLButtonElement,
   MenuToggleButtonProps
->(({ isOpen, className, ...props }, ref) => {
+>(({ isOpen, isLight, className, ...props }, ref) => {
   const buttonRef = React.useRef<HTMLButtonElement>(null)
   const lineTopRef = React.useRef<HTMLSpanElement>(null)
   const lineBottomRef = React.useRef<HTMLSpanElement>(null)
@@ -102,6 +103,9 @@ const MenuToggleButton = React.forwardRef<
       ref={buttonRef}
       className={cn(
         "group relative flex size-12 items-center justify-center rounded-full border border-black p-10 hover:border-white",
+        isLight
+          ? "border-black hover:bg-white hover:text-black"
+          : "border-white hover:bg-black hover:text-white",
         className
       )}
       {...props}
