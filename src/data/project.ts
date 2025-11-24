@@ -1,0 +1,53 @@
+import { Project } from "@/types/Project"
+
+export const projectData: Project[] = [
+  {
+    id: 1,
+    title: "EVENTSIN",
+    devId: "001",
+    imageUrl: "/images/Project.webp",
+    category: "WEB",
+    githubUrl: "#",
+    viewUrl: "#",
+    slug: "eventsin",
+    description:
+      "**Eventsin** is a web-based platform built with **MERN technology** (MongoDB, Express.js, React, Next.js) that aims to capture attention as a modern solution for event management in Indonesia, delivering an **interactive and responsive experience** that makes it easy for anyone to discover and join events, while also helping organizers effectively promote their events, encouraging everyone to explore and support various events through Eventsin.",
+    author: "I Komang Radita Suardhana",
+  },
+  {
+    id: 2,
+    title: "UNGGAS.ID",
+    devId: "002",
+    imageUrl: "/images/Project.webp",
+    category: "WEB",
+    githubUrl: "#",
+    viewUrl: "#",
+    slug: "unggas.id",
+    description: "",
+    author: "I Komang Radita Suardhana",
+  },
+  {
+    id: 3,
+    title: "PUSAT OLEH-OLEH",
+    devId: "003",
+    imageUrl: "/images/Project.webp",
+    category: "UI/UX DESIGN",
+    githubUrl: "#",
+    viewUrl: "#",
+    slug: "pusat-oleh-oleh",
+    description: "",
+    author: "I Komang Radita Suardhana",
+  },
+  {
+    id: 4,
+    title: "EASYLETTER",
+    devId: "004",
+    imageUrl: "/images/Project.webp",
+    category: "WEB",
+    githubUrl: "#",
+    viewUrl: "#",
+    slug: "easyletter",
+    description: "",
+    author: "I Komang Radita Suardhana",
+  },
+]
