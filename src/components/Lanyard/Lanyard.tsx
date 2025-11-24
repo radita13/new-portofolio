@@ -1,6 +1,6 @@
 "use client"
-import { useEffect, useRef, useState } from "react"
-import { Canvas, extend, useFrame } from "@react-three/fiber"
+import { useEffect, useRef, useState, type RefObject } from "react"
+import { Canvas, extend, useFrame, ThreeEvent } from "@react-three/fiber"
 import {
   useGLTF,
   useTexture,
@@ -12,17 +12,40 @@ import {
   CuboidCollider,
   Physics,
   RigidBody,
+  RigidBodyProps,
+  type RapierRigidBody,
   useRopeJoint,
   useSphericalJoint,
-  type RigidBodyProps,
 } from "@react-three/rapier"
 import { MeshLineGeometry, MeshLineMaterial } from "meshline"
 import * as THREE from "three"
+import { GLTF } from "three-stdlib"
 
 const cardGLB = "/lanyard.3d/card.glb"
 const lanyardImg = "/lanyard.3d/lanyard.png"
 
 extend({ MeshLineGeometry, MeshLineMaterial })
+
+// --- GLTF TYPE ---
+interface CardGLTF extends GLTF {
+  nodes: {
+    card: THREE.Mesh
+    clip: THREE.Mesh
+    clamp: THREE.Mesh
+  }
+  materials: {
+    base: THREE.MeshPhysicalMaterial
+    metal: THREE.MeshStandardMaterial
+  }
+}
+
+type ExtendedRigidBody = RapierRigidBody & {
+  lerped?: THREE.Vector3
+}
+
+type MeshLineGeometryType = THREE.BufferGeometry & {
+  setPoints: (points: THREE.Vector3[]) => void
+}
 
 // --- PROPS INTERFACE UNTUK LANYARD ---
 interface LanyardProps {
@@ -31,7 +54,7 @@ interface LanyardProps {
   fov?: number
   transparent?: boolean
   offsetX?: number
-  isSmall?: boolean // DITAMBAHKAN: Menerima info ukuran layar
+  isSmall?: boolean
 }
 
 export default function Lanyard({
@@ -40,7 +63,7 @@ export default function Lanyard({
   fov = 20,
   transparent = true,
   offsetX = 0,
-  isSmall = false, // DITAMBAHKAN: Menerima prop isSmall
+  isSmall = false,
 }: LanyardProps) {
   return (
     <div className="relative z-0 flex h-full w-full items-center justify-center">
@@ -54,17 +77,13 @@ export default function Lanyard({
       >
         <ambientLight intensity={Math.PI} />
         <Physics gravity={gravity} timeStep={1 / 60}>
-          {/* DIUBAH: Diberi 'key' prop. 
-            Saat 'isSmall' berubah, key akan berganti, 
-            memaksa komponen <Band> untuk di-remount dari awal.
-            Ini akan me-reset simulasi fisika dengan benar.
-          */}
           <Band
             key={isSmall ? "small" : "large"}
             offsetX={offsetX}
             isSmall={isSmall}
           />
         </Physics>
+
         <Environment blur={0.75}>
           <Lightformer
             intensity={2}
@@ -105,7 +124,7 @@ interface BandProps {
   maxSpeed?: number
   minSpeed?: number
   offsetX?: number
-  isSmall?: boolean // DITAMBAHKAN: Menerima info ukuran layar
+  isSmall?: boolean
 }
 
 function Band({
@@ -114,12 +133,13 @@ function Band({
   offsetX = 0,
   isSmall = false,
 }: BandProps) {
-  const band = useRef<any>(null)
-  const fixed = useRef<any>(null)
-  const j1 = useRef<any>(null)
-  const j2 = useRef<any>(null)
-  const j3 = useRef<any>(null)
-  const card = useRef<any>(null)
+  // --- TIDAK ADA ANY LAGI ---
+  const band = useRef<THREE.Mesh>(null)
+  const fixed = useRef<ExtendedRigidBody>(null)
+  const j1 = useRef<ExtendedRigidBody>(null)
+  const j2 = useRef<ExtendedRigidBody>(null)
+  const j3 = useRef<ExtendedRigidBody>(null)
+  const card = useRef<ExtendedRigidBody>(null)
 
   const vec = new THREE.Vector3()
   const ang = new THREE.Vector3()
@@ -134,8 +154,9 @@ function Band({
     linearDamping: 4,
   }
 
-  const { nodes, materials } = useGLTF(cardGLB) as any
+  const { nodes, materials } = useGLTF(cardGLB) as unknown as CardGLTF
   const texture = useTexture(lanyardImg)
+
   const [curve] = useState(
     () =>
       new THREE.CatmullRomCurve3([
@@ -145,19 +166,33 @@ function Band({
         new THREE.Vector3(),
       ])
   )
-  const [dragged, drag] = useState<false | THREE.Vector3>(false)
-  const [hovered, hover] = useState(false)
 
-  // DIHAPUS: Logika state dan effect untuk deteksi layar dipindahkan ke parent component.
-  // Komponen ini sekarang hanya menerima prop 'isSmall'.
+  const [dragged, setDragged] = useState<false | THREE.Vector3>(false)
+  const [hovered, setHovered] = useState(false)
 
-  useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 1])
-  useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], 1])
-  useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 1])
-  useSphericalJoint(j3, card, [
-    [0, 0, 0],
-    [0, 1.45, 0],
-  ])
+  useRopeJoint(
+    fixed as unknown as RefObject<ExtendedRigidBody>,
+    j1 as unknown as RefObject<ExtendedRigidBody>,
+    [[0, 0, 0], [0, 0, 0], 1]
+  )
+  useRopeJoint(
+    j1 as unknown as RefObject<ExtendedRigidBody>,
+    j2 as unknown as RefObject<ExtendedRigidBody>,
+    [[0, 0, 0], [0, 0, 0], 1]
+  )
+  useRopeJoint(
+    j2 as unknown as RefObject<ExtendedRigidBody>,
+    j3 as unknown as RefObject<ExtendedRigidBody>,
+    [[0, 0, 0], [0, 0, 0], 1]
+  )
+  useSphericalJoint(
+    j3 as unknown as RefObject<ExtendedRigidBody>,
+    card as unknown as RefObject<ExtendedRigidBody>,
+    [
+      [0, 0, 0],
+      [0, 1.45, 0],
+    ]
+  )
 
   useEffect(() => {
     if (hovered) {
@@ -169,40 +204,64 @@ function Band({
   }, [hovered, dragged])
 
   useFrame((state, delta) => {
-    if (dragged && typeof dragged !== "boolean") {
+    if (dragged instanceof THREE.Vector3) {
       vec.set(state.pointer.x, state.pointer.y, 0.5).unproject(state.camera)
       dir.copy(vec).sub(state.camera.position).normalize()
       vec.add(dir.multiplyScalar(state.camera.position.length()))
       ;[card, j1, j2, j3, fixed].forEach((ref) => ref.current?.wakeUp())
+
       card.current?.setNextKinematicTranslation({
         x: vec.x - dragged.x,
         y: vec.y - dragged.y,
         z: vec.z - dragged.z,
       })
     }
+
     if (fixed.current) {
       ;[j1, j2].forEach((ref) => {
+        if (!ref.current) return
         if (!ref.current.lerped)
           ref.current.lerped = new THREE.Vector3().copy(
             ref.current.translation()
           )
-        const clampedDistance = Math.max(
-          0.1,
-          Math.min(1, ref.current.lerped.distanceTo(ref.current.translation()))
+
+        const distance = ref.current.lerped.distanceTo(
+          ref.current.translation()
         )
+        const clamped = Math.max(0.1, Math.min(1, distance))
+
         ref.current.lerped.lerp(
           ref.current.translation(),
-          delta * (minSpeed + clampedDistance * (maxSpeed - minSpeed))
+          delta * (minSpeed + clamped * (maxSpeed - minSpeed))
         )
       })
-      curve.points[0].copy(j3.current.translation())
-      curve.points[1].copy(j2.current.lerped)
-      curve.points[2].copy(j1.current.lerped)
-      curve.points[3].copy(fixed.current.translation())
-      band.current.geometry.setPoints(curve.getPoints(32))
-      ang.copy(card.current.angvel())
-      rot.copy(card.current.rotation())
-      card.current.setAngvel({ x: ang.x, y: ang.y - rot.y * 0.25, z: ang.z })
+
+      if (
+        j3.current &&
+        j2.current?.lerped &&
+        j1.current?.lerped &&
+        fixed.current
+      ) {
+        curve.points[0].copy(j3.current.translation())
+        curve.points[1].copy(j2.current.lerped)
+        curve.points[2].copy(j1.current.lerped)
+        curve.points[3].copy(fixed.current.translation())
+
+        if (band.current) {
+          ;(band.current?.geometry as MeshLineGeometryType).setPoints(
+            curve.getPoints(32)
+          )
+        }
+      }
+
+      if (card.current) {
+        ang.copy(card.current.angvel())
+        rot.copy(card.current.rotation())
+        card.current.setAngvel(
+          { x: ang.x, y: ang.y - rot.y * 0.25, z: ang.z },
+          true
+        )
+      }
     }
   })
 
@@ -213,15 +272,19 @@ function Band({
     <>
       <group position={[offsetX, 4, 0]}>
         <RigidBody ref={fixed} {...segmentProps} type="fixed" />
+
         <RigidBody position={[0.5, 0, 0]} ref={j1} {...segmentProps}>
           <BallCollider args={[0.1]} />
         </RigidBody>
+
         <RigidBody position={[1, 0, 0]} ref={j2} {...segmentProps}>
           <BallCollider args={[0.1]} />
         </RigidBody>
+
         <RigidBody position={[1.5, 0, 0]} ref={j3} {...segmentProps}>
           <BallCollider args={[0.1]} />
         </RigidBody>
+
         <RigidBody
           position={[2, 0, 0]}
           ref={card}
@@ -229,21 +292,22 @@ function Band({
           type={dragged ? "kinematicPosition" : "dynamic"}
         >
           <CuboidCollider args={[0.8, 1.125, 0.01]} />
+
           <group
             scale={2.25}
             position={[0, -1.2, -0.05]}
-            onPointerOver={() => hover(true)}
-            onPointerOut={() => hover(false)}
-            onPointerUp={(e: any) => {
-              e.target.releasePointerCapture(e.pointerId)
-              drag(false)
+            onPointerOver={() => setHovered(true)}
+            onPointerOut={() => setHovered(false)}
+            onPointerUp={(e: ThreeEvent<PointerEvent>) => {
+              ;(e.target as Element).releasePointerCapture(e.pointerId)
+              setDragged(false)
             }}
-            onPointerDown={(e: any) => {
-              e.target.setPointerCapture(e.pointerId)
-              drag(
+            onPointerDown={(e: ThreeEvent<PointerEvent>) => {
+              ;(e.target as Element).setPointerCapture(e.pointerId)
+              setDragged(
                 new THREE.Vector3()
                   .copy(e.point)
-                  .sub(vec.copy(card.current.translation()))
+                  .sub(vec.copy(card.current!.translation()))
               )
             }}
           >
@@ -257,21 +321,23 @@ function Band({
                 metalness={0.8}
               />
             </mesh>
+
             <mesh
               geometry={nodes.clip.geometry}
               material={materials.metal}
               material-roughness={0.3}
             />
+
             <mesh geometry={nodes.clamp.geometry} material={materials.metal} />
           </group>
         </RigidBody>
       </group>
+
       <mesh ref={band}>
         <meshLineGeometry />
         <meshLineMaterial
           color="white"
           depthTest={false}
-          // DIUBAH: Menggunakan prop 'isSmall' secara langsung
           resolution={isSmall ? [1000, 2000] : [1000, 1000]}
           useMap
           map={texture}

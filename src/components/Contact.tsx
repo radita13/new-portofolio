@@ -52,7 +52,7 @@ export default function Contact() {
 
         <div className="flex min-h-screen w-full flex-col justify-center gap-16">
           <h1 className="w-full pt-10 text-center text-4xl font-semibold sm:text-5xl md:text-8xl">
-            Let's start a new project 🚀
+            Let&apos;s start a new project 🚀
           </h1>
           <form
             onSubmit={handleSubmit}
@@ -61,7 +61,8 @@ export default function Contact() {
             <div className="grid w-full grid-cols-1 gap-10 md:grid-cols-2">
               <div className="relative flex w-full flex-col gap-2">
                 <label htmlFor="name" className="text-2xl font-medium">
-                  What's your name ? <span className="text-red-500">*</span>
+                  What&apos;s your name ?{" "}
+                  <span className="text-red-500">*</span>
                 </label>
                 <Input
                   id="name"
@@ -84,7 +85,8 @@ export default function Contact() {
               </div>
               <div className="relative flex w-full flex-col gap-2">
                 <label htmlFor="email" className="text-2xl font-medium">
-                  What's your email ? <span className="text-red-500">*</span>
+                  What&apos;s your email ?{" "}
+                  <span className="text-red-500">*</span>
                 </label>
                 <Input
                   id="email"
@@ -109,7 +111,8 @@ export default function Contact() {
 
             <div className="flex w-full flex-col gap-2">
               <label htmlFor="message" className="text-2xl font-medium">
-                What's your massage ? <span className="text-red-500">*</span>
+                What&apos;s your message ?{" "}
+                <span className="text-red-500">*</span>
               </label>
               <Textarea
                 id="message"

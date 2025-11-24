@@ -1,4 +1,3 @@
-import { s } from "framer-motion/m"
 import { useState } from "react"
 
 interface FormData {
@@ -31,7 +30,7 @@ export default function useContactForm() {
   const [statusMessage, setStatusMessage] = useState<StatusMessage | null>(null)
 
   const validate = (fieldName: keyof FormData, value: string) => {
-    let newErrors: Errors = { ...errors }
+    const newErrors: Errors = { ...errors }
 
     switch (fieldName) {
       case "name":

@@ -9,9 +9,9 @@ import Footer from "@/components/shared/Footer"
 import ReactMarkdown from "react-markdown"
 
 type PageProps = {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
 export async function generateMetadata({

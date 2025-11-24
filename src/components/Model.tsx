@@ -37,6 +37,17 @@ export function Model(props: JSX.IntrinsicElements["group"]) {
   const clone = React.useMemo(() => SkeletonUtils.clone(scene), [scene])
   const { nodes, materials } = useGraph(clone) as unknown as GLTFResult
   const { actions } = useAnimations(animations, group)
+
+  React.useEffect(() => {
+    const action = actions["holy cow! an animation?!"]
+
+    action?.reset().fadeIn(0.5).play()
+
+    return () => {
+      action?.fadeOut(0.5)
+    }
+  }, [actions])
+
   return (
     <group ref={group} {...props} dispose={null}>
       <group name="Sketchfab_Scene">

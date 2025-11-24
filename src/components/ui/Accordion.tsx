@@ -110,7 +110,7 @@ export default function AccordionSection() {
           </AccordionTrigger>
           <AccordionContent className="flex flex-col gap-4 text-balance">
             <p className="text-sm break-all transition-transform duration-300 group-hover:translate-x-3 md:text-lg md:break-normal">
-              I'm most enthusiastic about projects that challenge{" "}
+              I&apos;m most enthusiastic about projects that challenge{" "}
               <strong>my creativity</strong> and{" "}
               <strong>deliver real value to users </strong>. I enjoy the entire
               process of building clean, intuitive, and responsive user
@@ -118,8 +118,8 @@ export default function AccordionSection() {
             </p>
             <p className="text-sm break-all transition-transform duration-300 group-hover:translate-x-3 md:text-lg md:break-normal">
               Projects that allow me to learn new technologies or integrate with
-              complex APIs are also particularly exciting to me, as I'm always
-              eager to grow my skill set.
+              complex APIs are also particularly exciting to me, as I&apos;m
+              always eager to grow my skill set.
             </p>
           </AccordionContent>
         </AccordionItem>
@@ -129,15 +129,15 @@ export default function AccordionSection() {
           </AccordionTrigger>
           <AccordionContent className="flex flex-col gap-4 text-balance">
             <p className="text-sm break-all transition-transform duration-300 group-hover:translate-x-3 md:text-lg md:break-normal">
-              Absolutely! I am always open to new opportunities, whether it's a
-              <strong> full-time position</strong>,{" "}
+              Absolutely! I am always open to new opportunities, whether
+              it&apos;s a<strong> full-time position</strong>,{" "}
               <strong> freelance work </strong>, or an interesting project
-              <strong> collaboration</strong>. I'm eager to continue learning
-              and contributing to impactful projects.
+              <strong> collaboration</strong>. I&apos;m eager to continue
+              learning and contributing to impactful projects.
             </p>
             <p className="text-sm break-all transition-transform duration-300 group-hover:translate-x-3 md:text-lg md:break-normal">
               Please feel free to reach out via my contact page or email me
-              directly at <strong>raditabussiness@gmail.com</strong>. Let's
+              directly at <strong>raditabussiness@gmail.com</strong>. Let&apos;s
               create something amazing together!
             </p>
           </AccordionContent>
